@@ -90,7 +90,6 @@ function displayMarker(place, markerIndex) {
     });
 }
 
-
 // 오버레이의 내용 업데이트.
 function updateOverlayContent(markerInfo) {
     var place = markerInfo.place;
@@ -104,16 +103,16 @@ function updateOverlayContent(markerInfo) {
     '       </div>' +
     '       <div class="body">' +
     '           <div class="img">' +
-    '               <img src="/assets/images/p.png" width="73" height="73">' +
+    '               <img src="/assets/images/p.png">' +
     '           </div>' +
     '           <div class="desc">' +
     '               <div class="available">주차 가능 대수</div>' +
     '               <div class="cnt">' + markerInfo.car + '</div>' +
     '               <div class="buttons">' +
-    '                   <button class="plus" onclick="parkIn(this)" data-marker-index="' +
+    '                   <button class="inBtn" onclick="parkIn(this)" data-marker-index="' +
                             markers.indexOf(markerInfo) +
                         '">입차</button>' +
-    '                   <button class="minus" onclick="parkOut(this)" data-marker-index="' +
+    '                   <button class="outBtn" onclick="parkOut(this)" data-marker-index="' +
                             markers.indexOf(markerInfo) +
                         '">출차</button>' +
     '               </div>' +
