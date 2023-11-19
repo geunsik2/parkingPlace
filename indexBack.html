@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kakao 지도 시작하기</title>
+    <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9c8f8976c39eecece38e1a156294fa86&libraries=services,clusterer,drawing"></script>
+
+    <script>
+    var overlay;    // 커스텀 오버레이
+var car = 5;    // 주차 가능 대수.
+
+var mapContainer = document.getElementById('map'),
+mapOption = { 
+    center: new kakao.maps.LatLng(35.834685, 128.682313), // 지도의 중심좌표.
+    level: 3 // 지도의 확대 레벨.
+}; 
+
+var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성.
+
+// 장소 검색 객체를 생성.
+var ps = new kakao.maps.services.Places(map);
+
+// 카테고리로 주차장을 검색.
+ps.categorySearch('PK6', placesSearchCB, {useMapBounds:true});
+
+// 키워드 검색 완료 시 호출되는 콜백함수.
+function placesSearchCB (data, status, pagination) {
+    if (status === kakao.maps.services.Status.OK) {
+        for (var i=0; i<data.length; i++) {
+            displayMarker(data[i]);    
+        }       
+    }
+}
+
+// 커스텀 오버레이 닫기.
+function closeOverlay() {
+    overlay.setMap(null);     
+}
+
+// 입차 버튼 클릭 시 주차 가능 대수 -1
+function parkIn(th) {
+    var carCnt = Number($(th).parents('.wrap').find('.cnt').html());
+    if(carCnt != 0) {
+        carCnt -= 1;
+        $(th).parents('.wrap').find('.cnt').html(carCnt);
+    }
+}
+
+// 입차 버튼 클릭 시 주차 가능 대수 +1
+function parkOut(th) {
+    var carCnt = Number($(th).parents('.wrap').find('.cnt').html());
+    if(carCnt < 5) {
+        carCnt += 1;
+        $(th).parents('.wrap').find('.cnt').html(carCnt);
+    }
+}
+
+// 지도에 마커를 표시하는 함수.
+function displayMarker(place) {
+    // 마커를 생성하고 지도에 표시.
+    var marker = new kakao.maps.Marker({
+        map: map,
+        position: new kakao.maps.LatLng(place.y, place.x) 
+    });
+
+    // 마커에 클릭이벤트를 등록.
+    kakao.maps.event.addListener(marker, 'click', function() {
+        // 마커를 클릭하면 상세정보가 오버레이에 표출.
+        var content = '<div class="wrap">' + 
+            '    <div class="info">' + 
+            '        <div class="title">' + 
+                            place.place_name + 
+            '            <div class="close" onclick="closeOverlay()" title="닫기"></div>' + 
+            '        </div>' + 
+            '        <div class="body">' + 
+            '            <div class="img">' +
+            '                <img src="/assets/images/p.png" width="73" height="73">' +
+            '           </div>' + 
+            '            <div class="desc">' + 
+            '                <div class="available">주차 가능 대수</div>' + 
+            '                <div class="cnt">' +
+                                car + 
+            '                </div>' +
+            '                <div class="buttons">' + 
+            '                   <button class="plus" onclick="parkIn(this)">입차</button>' + 
+            '                   <button class="minus" onclick="parkOut(this)">출차</button>' + 
+            '                </div>' +
+            '                <div class="ellipsis">' +
+                                place.road_address_name + 
+            '                </div>' + 
+            '                <div class="jibun ellipsis">(지번) ' +
+                                place.address_name + 
+            '                </div>' + 
+            '                <div></div>' + 
+            '            </div>' + 
+            '        </div>' + 
+            '    </div>' +    
+            '</div>';
+
+        // 기존 overlay가 있다면 지도에서 제거.
+        if(overlay) {
+            overlay.setMap(null);
+        }
+
+        // 새로운 overlay를 생성.
+        overlay = new kakao.maps.CustomOverlay({
+            content: content,
+            map: map,
+            position: marker.getPosition()
+        });
+
+        // // 마커를 클릭했을 때 커스텀 오버레이를 표시.
+        // kakao.maps.event.addListener(marker, 'click', function() {
+        //     overlay.setMap(map);
+        // });
+    });
+}
+    </script>
+</body>
+</html>
